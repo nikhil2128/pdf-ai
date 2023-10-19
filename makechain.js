@@ -1,6 +1,7 @@
 import { OpenAI } from 'langchain/llms/openai';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
-
+import { PromptTemplate } from 'langchain/prompts';
+import { BufferMemory } from 'langchain/memory'
 const CONDENSE_PROMPT = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
 
 Chat History:
@@ -20,7 +21,7 @@ Helpful answer in markdown:`;
 export const makeChain = (vectorstore) => {
   const model = new OpenAI({
     temperature: 1, // increase temepreature to get more creative answers
-    modelName: 'gpt-3.5-turbo', //change this to gpt-4 if you have access
+    modelName: 'gpt-4', //change this to gpt-4 if you have access
   });
 
   const chain = ConversationalRetrievalQAChain.fromLLM(
@@ -29,6 +30,15 @@ export const makeChain = (vectorstore) => {
     {
       qaTemplate: QA_PROMPT,
       questionGeneratorTemplate: CONDENSE_PROMPT,
+      // qaChainOptions: {
+      //   prompt: PromptTemplate.fromTemplate(QA_PROMPT),
+      //   type: 'stuff',
+      // },
+      // memory: new BufferMemory({
+      //   inputKey: "question",
+      //   memoryKey: "chat_history",
+      //   outputKey: "text",
+      // }),
       returnSourceDocuments: true, //The number of source documents returned is 4 by default
     },
   );
